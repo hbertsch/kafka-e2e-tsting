@@ -18,5 +18,5 @@ ENV KAFKA_BROKER=${KAFKA_BROKER}
 ENV TOPIC=${TOPIC}
 
 # Run consumer.py when the container launches
-CMD ["python", "-u", "consumer.py"]
+CMD ["python", "-u", "consumer_batchMessage.py"]
 

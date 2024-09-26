@@ -8,7 +8,7 @@ services:
     ports:
       - "2181:2181"  # Expose Zookeeper's default port
 
-  # Kafka broker service
+    # Kafka broker service
   kafka:
     image: bitnami/kafka:latest
     container_name: kafka
@@ -17,13 +17,14 @@ services:
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181  # Connect to Zookeeper
-      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT://localhost:9092
-      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
-      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_LISTENERS=INTERNAL://:9092,EXTERNAL://:9093
+      - KAFKA_ADVERTISED_LISTENERS=INTERNAL://kafka:9092,EXTERNAL://localhost:9093
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
       - ALLOW_PLAINTEXT_LISTENER=yes  # Allow plaintext for testing
     ports:
-      - "9092:9092"  # Expose Kafka's default port
+      - "9092:9092"  # Internal communication
+      - "9093:9093"  # External communication
 
   # Producer service that sends messages continuously
   producer:
@@ -31,28 +32,44 @@ services:
     image: kafka-producer:latest
     container_name: kafka-producer
     depends_on:
-      - kafka  # Producer depends on Kafka broker
+      - kafka
     environment:
-      - KAFKA_BROKER=kafka:9092  # Kafka broker address
-      - TOPIC=test-topic  # Topic to send messages to
+      - KAFKA_BROKER=kafka:9092
+      - TOPIC=test-topic
 
   # Consumer service that subscribes to the topic and verifies messages
-  consumer1:
-    build: ./consumer  # Build from Dockerfile in 'consumer' directory
-    image: kafka-consumer1:latest
-    container_name: kafka-consumer1
+  consumer_from_oldest:
+    build: 
+      context: ./consumer  # Build from Dockerfile in directory
+      dockerfile: consumer_fromOldest.dockerfile
+    image: consumer_from_oldest:latest
+    container_name: consumer_from_oldest
     depends_on:
-      - kafka  # Consumer depends on Kafka broker
+      - kafka
     environment:
-      - KAFKA_BROKER=kafka:9092  # Kafka broker address
-      - TOPIC=test-topic  # Topic to subscribe to
+      - KAFKA_BROKER=kafka:9092
+      - TOPIC=test-topic
 
-  consumer2:
-    build: ./consumer  # Build from Dockerfile in 'consumer' directory
-    image: kafka-consumer2:latest
-    container_name: kafka-consumer2
+  consumer_from_newest:
+    build: 
+      context: ./consumer  # Build from Dockerfile in directory
+      dockerfile: consumer_fromNewest.dockerfile
+    image: consumer_from_newest:latest
+    container_name: consumer_from_newest
     depends_on:
-      - kafka  # Consumer depends on Kafka broker
+      - kafka
     environment:
-      - KAFKA_BROKER=kafka:9092  # Kafka broker address
-      - TOPIC=test-topic  # Topic to subscribe to
+      - KAFKA_BROKER=kafka:9092
+      - TOPIC=test-topic
+
+  consumer_batch_message:
+    build: 
+      context: ./consumer  # Build from Dockerfile in directory
+      dockerfile: consumer_batchMessage.dockerfile
+    image: consumer_batch_message:latest
+    container_name: consumer_batch_message
+    depends_on:
+      - kafka
+    environment:
+      - KAFKA_BROKER=kafka:9092
+      - TOPIC=test-topic
