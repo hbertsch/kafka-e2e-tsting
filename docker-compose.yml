@@ -1,0 +1,58 @@
+services:
+  # Zookeeper service required for Kafka coordination
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes  # Allow anonymous connections for simplicity
+    ports:
+      - "2181:2181"  # Expose Zookeeper's default port
+
+  # Kafka broker service
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: kafka
+    depends_on:
+      - zookeeper  # Kafka depends on Zookeeper
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181  # Connect to Zookeeper
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT://localhost:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - ALLOW_PLAINTEXT_LISTENER=yes  # Allow plaintext for testing
+    ports:
+      - "9092:9092"  # Expose Kafka's default port
+
+  # Producer service that sends messages continuously
+  producer:
+    build: ./producer  # Build from Dockerfile in 'producer' directory
+    image: kafka-producer:latest
+    container_name: kafka-producer
+    depends_on:
+      - kafka  # Producer depends on Kafka broker
+    environment:
+      - KAFKA_BROKER=kafka:9092  # Kafka broker address
+      - TOPIC=test-topic  # Topic to send messages to
+
+  # Consumer service that subscribes to the topic and verifies messages
+  consumer1:
+    build: ./consumer  # Build from Dockerfile in 'consumer' directory
+    image: kafka-consumer1:latest
+    container_name: kafka-consumer1
+    depends_on:
+      - kafka  # Consumer depends on Kafka broker
+    environment:
+      - KAFKA_BROKER=kafka:9092  # Kafka broker address
+      - TOPIC=test-topic  # Topic to subscribe to
+
+  consumer2:
+    build: ./consumer  # Build from Dockerfile in 'consumer' directory
+    image: kafka-consumer2:latest
+    container_name: kafka-consumer2
+    depends_on:
+      - kafka  # Consumer depends on Kafka broker
+    environment:
+      - KAFKA_BROKER=kafka:9092  # Kafka broker address
+      - TOPIC=test-topic  # Topic to subscribe to

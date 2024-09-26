@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "Kafka E2E Tests"
+version = "0.0.1"
+description = "Kafka E2E Tests"
+authors = ["Henning Bertsch <mail@henningbertsch.com>"]
+readme = "n.a."
+packages = [{include = "api"}]
+
+[tool.poetry.scripts]
+start = "api.main:start"
+
+[tool.poetry.group.dev.dependencies]
+jupyter = "^1.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+follow_imports = "skip"
+ignore_missing_imports = true
+strict_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[tool.poetry.dependencies]
+python = "^3.9"
+python-dotenv = "^1.0.1"
+kafka-python = "^2.0.0"
+
+matplotlib = "^3.9.2"
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
