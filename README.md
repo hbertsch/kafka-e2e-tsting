@@ -12,6 +12,15 @@ This project demonstrates a simple messaging system using **Apache Kafka**. The 
 
 This project aims to help developers understand how different configurations can affect consumer behavior when working with Kafka topics and messages.
 
+> **Notice**: This project is designed to work seamlessly with **Visual Studio Code (VS Code)**. The `.vscode` folder is included with configuration files to make the development environment easier to manage.
+>
+> - **launch.json**: Provides preconfigured debugging setups for the project.
+> - **settings.json**: Contains specific project-related VS Code settings.
+>
+> The `launch.json` is already set up to allow easy debugging of the Python scripts within the **producer** and **consumer** services. You can simply press `F5` or use the **Run and Debug** tab in VS Code to launch your services for debugging.
+>
+> The python scripts are set up to use port 9093, wich is the "external" port of the docker stack. So you can communicate with Kafka from your host machine.
+
 ## How to Set Up
 
 ### Prerequisites

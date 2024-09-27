@@ -6,7 +6,7 @@ from kafka import KafkaProducer
 from kafka.errors import NoBrokersAvailable, KafkaError
 
 # Get Kafka broker and topic from environment variables
-KAFKA_BROKER = os.environ.get('KAFKA_BROKER', 'localhost:9092')
+KAFKA_BROKER = os.environ.get('KAFKA_BROKER', 'localhost:9093')
 TOPIC = os.environ.get('TOPIC', 'test-topic')
 
 print(f"Kafka broker: {KAFKA_BROKER}")
